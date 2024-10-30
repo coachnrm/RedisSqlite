@@ -1,0 +1,6 @@
+@RedisSqlite_HostAddress = http://localhost:5234
+
+GET {{RedisSqlite_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

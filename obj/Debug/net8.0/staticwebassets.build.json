@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "J6lZKeuXgnF+xeWFbDoxZaZ1t9w9dKVjpwSQ4rp2ovM=",
+  "Source": "RedisSqlite",
+  "BasePath": "_content/RedisSqlite",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
