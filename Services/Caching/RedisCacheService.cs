@@ -14,12 +14,6 @@ namespace RedisSqlite.Services.Caching
         }
         public T? GetData<T>(string key)
         {
-            // var data = _cache?.GetString(key);
-
-            // if (data is null)
-            //     return default(T);
-
-            // return JsonSerializer.Deserialize<T>(data)!;
             var data = _database.StringGet(key);
             if (data.IsNull)
                 return default;
@@ -29,12 +23,6 @@ namespace RedisSqlite.Services.Caching
 
         public void SetData<T>(string key, T data, TimeSpan? expiration = null)
         {
-            // var options = new DistributedCacheEntryOptions()
-            // {
-            //     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
-            // };
-
-            // _cache?.SetString(key, JsonSerializer.Serialize(data), options);
             var jsonData = JsonSerializer.Serialize(data);
             _database.StringSet(key, jsonData, expiration);
         }

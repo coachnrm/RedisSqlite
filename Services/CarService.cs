@@ -18,7 +18,8 @@ namespace RedisSqlite.Services
 
         public async Task<IEnumerable<Car>> GetAllCarsAsync()
         {
-            var redisData = _db.HashGetAll("cardb");
+            var redisData = _db.HashGetAll("carall");
+            //var redisData = _db.HashGetAll("cardb"); if get from post in Redis
             if (redisData.Length == 0)
             {
                 // Retrieve all cars from the database
@@ -46,25 +47,49 @@ namespace RedisSqlite.Services
            
         }
 
-        public async Task<Car> GetCarByIdAsync(int id)
+        public async Task<Car?> GetCarByIdAsync(int id)
         {
-            var redisData = _db.HashGetAll("cardb");
-            return await _dbContext.Cars.FirstOrDefaultAsync(c => c.Id == id);
+            Car DataFromDb =  await _dbContext.Cars.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (DataFromDb != null)
+            {
+                // Serialize the car object and store it in Redis
+                _db.HashSet($"car{DataFromDb.Id}", new HashEntry[]
+                {
+                    new HashEntry(DataFromDb.Id, JsonSerializer.Serialize(DataFromDb))
+                });
+
+                // Set expiration for the hash key
+                _db.KeyExpire($"car{DataFromDb.Id}", TimeSpan.FromMinutes(1));
+            }       
+
+            return DataFromDb;
         }
 
         public async Task<Car> AddCarAsync(Car car)
         {
-            _dbContext.Cars.Add(car);
-            _db.HashSet("cardb", new HashEntry[]
+            try
             {
-                new HashEntry(car.Id, JsonSerializer.Serialize(car))
-            });
+                _dbContext.Cars.Add(car);
+                await _dbContext.SaveChangesAsync();
 
-            // Set expiration for the hash key
-            _db.KeyExpire("cardb", TimeSpan.FromMinutes(2));
+                var serializedCar = JsonSerializer.Serialize(car);
+                // Serialize the car object and store it in Redis
+                await _db.HashSetAsync($"caradd:{car.Id}", new HashEntry[] 
+                {
+                    new HashEntry(car.Id, serializedCar)
+                });
 
-            await _dbContext.SaveChangesAsync();
-            return car;
+                // Set expiration for the hash key
+                await _db.KeyExpireAsync($"caradd:{car.Id}", TimeSpan.FromMinutes(1));
+
+                return car;
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception (e.g., log it)
+                throw; // or return an appropriate result
+            }
         }
 
         public async Task<Car?> UpdateCarAsync(int id, Car car)
@@ -79,6 +104,15 @@ namespace RedisSqlite.Services
             existingCar.Model = car.Model;
             existingCar.Year = car.Year;
             existingCar.Color = car.Color;
+
+            _db.HashSet($"carupdate{id}", new HashEntry[]
+            {
+                new HashEntry(car.Id, JsonSerializer.Serialize(existingCar))
+            });
+
+            // Set expiration for the hash key
+            _db.KeyExpire($"carupdate{id}", TimeSpan.FromMinutes(1));
+
             await _dbContext.SaveChangesAsync();
             return existingCar;
         }
@@ -90,7 +124,7 @@ namespace RedisSqlite.Services
             {
                 _dbContext.Cars.Remove(car);
                 _dbContext.SaveChangesAsync();
-                _db.HashDelete("cardb",$"car:{id}");
+                //_db.HashDelete("cardb",$"car:{id}");
             }
             return car;
         }
