@@ -29,7 +29,7 @@ namespace RedisSqlite.Controllers
             return Ok(cars);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("carid/{id}")]
         public async Task<IActionResult> GetCarById(int id)
         {
             var car = await _carService.GetCarByIdAsync(id);
