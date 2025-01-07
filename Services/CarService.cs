@@ -133,5 +133,75 @@ namespace RedisSqlite.Services
         {
             return await _dbContext.Cars.Where(c => c.Make.Contains(keyword) || c.Color.Contains(keyword)).ToListAsync();
         }
+
+        public async Task<IEnumerable<Car>> GetAllCarsEqualDbAsync()
+        {
+            // Get all cars from Redis
+            var redisData = _db.HashGetAll("carall");
+
+            if (redisData.Length == 0)
+            {
+                // No data in Redis, fetch from database
+                return await LoadDataFromDatabaseAsync();
+            }
+
+            // Deserialize Redis data
+            var redisCars = redisData
+                .Select(entry => JsonSerializer.Deserialize<Car>(entry.Value))
+                .ToList();
+
+            // Get data from the database
+            var databaseCars = await _dbContext.Cars.ToListAsync();
+
+            // Compare Redis data and database data
+            var redisSet = new HashSet<int>(redisCars.Select(car => car.Id));
+            var databaseSet = new HashSet<int>(databaseCars.Select(car => car.Id));
+
+            if (!redisSet.SetEquals(databaseSet))
+            {
+                // Data mismatch, reload from database
+                return await ReloadDataFromDatabaseAsync(databaseCars);
+            }
+
+            // If data matches, return data from Redis
+            return redisCars;
+        }
+
+        private async Task<IEnumerable<Car>> LoadDataFromDatabaseAsync()
+        {
+            var data = await _dbContext.Cars.ToListAsync();
+
+            // Store each car in Redis hash
+            var hashEntries = data.Select(car =>
+                new HashEntry(car.Id, JsonSerializer.Serialize(car))
+            ).ToArray();
+
+            // Set the hash entries in Redis
+            _db.HashSet("carall", hashEntries);
+
+            // Set expiration for the hash key
+            _db.KeyExpire("carall", TimeSpan.FromMinutes(1));
+
+            return data;
+        }
+
+        private async Task<IEnumerable<Car>> ReloadDataFromDatabaseAsync(IEnumerable<Car> databaseCars)
+        {
+            // Remove the existing Redis data
+            _db.KeyDelete("carall");
+
+            // Reload data into Redis
+            var hashEntries = databaseCars.Select(car =>
+                new HashEntry(car.Id, JsonSerializer.Serialize(car))
+            ).ToArray();
+
+            // Set the new hash entries in Redis
+            _db.HashSet("carall", hashEntries);
+
+            // Set expiration for the hash key
+            _db.KeyExpire("carall", TimeSpan.FromMinutes(1));
+
+            return databaseCars;
+        }
     }
 }

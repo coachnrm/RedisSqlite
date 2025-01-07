@@ -10,5 +10,6 @@ namespace RedisSqlite.Services
         Task<Car?> UpdateCarAsync(int id, Car car);
         Task<Car> DeleteCarAsync(int id);
         Task<List<Car>> SearchCarsAsync(string keyword);
+        Task<IEnumerable<Car>> GetAllCarsEqualDbAsync();
     }
 }

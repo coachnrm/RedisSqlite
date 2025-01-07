@@ -266,3 +266,6 @@ D:/RedisSqlite/obj/Debug/net8.0/RedisSqlite.pdb
 D:/RedisSqlite/obj/Debug/net8.0/RedisSqlite.genruntimeconfig.cache
 D:/RedisSqlite/obj/Debug/net8.0/ref/RedisSqlite.dll
 /Users/home/Desktop/RedisSqlite/obj/Debug/net8.0/RedisSqlite.sourcelink.json
+/Users/home/Desktop/RedisSqlite/bin/Debug/net8.0/RedisSqlite.staticwebassets.endpoints.json
+/Users/home/Desktop/RedisSqlite/obj/Debug/net8.0/staticwebassets.build.endpoints.json
+/Users/home/Desktop/RedisSqlite/obj/Debug/net8.0/staticwebassets/msbuild.RedisSqlite.Microsoft.AspNetCore.StaticWebAssetEndpoints.props

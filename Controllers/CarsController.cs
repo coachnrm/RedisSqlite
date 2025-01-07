@@ -56,6 +56,18 @@ namespace RedisSqlite.Controllers
             return Ok(cars);
         }
 
+         [HttpGet("checkdb")]
+        public async Task<IActionResult> GetAllCarsCheckDB()
+        {
+            var cars = await _carService.GetAllCarsEqualDbAsync();
+            if (cars is not null)
+            {
+                return Ok(cars);
+            }
+
+            return Ok(cars);
+        }
+
         [HttpGet("carid/{id}")]
         public async Task<IActionResult> GetCarById(int id)
         {
