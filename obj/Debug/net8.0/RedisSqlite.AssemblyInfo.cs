@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RedisSqlite")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+25077eef13fd83adbab6f91aadf15f289fba0d01")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9785aa6dcee32a2e6b770f7aaeda96a000b28ce4")]
 [assembly: System.Reflection.AssemblyProductAttribute("RedisSqlite")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RedisSqlite")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
